@@ -26,6 +26,8 @@ func NewSemaphorePool(concurrency int64) *SemaphorePool {
 
 func (s SemaphorePool) Submit(f func()) {
 	s.wg.Add(1)
+	// FIXME: This actually blocks. But moving the Acquire into the goroutine causes `go test . -race` to crash with
+	// "limit on 8128 simultaneously alive goroutines is exceeded, dying".
 	err := s.sem.Acquire(s.ctx, 1)
 	if err != nil {
 		panic(err)
