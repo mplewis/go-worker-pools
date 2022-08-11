@@ -27,17 +27,21 @@ The following worker pool strategies are featured here:
   limit concurrency. This is my favorite interface and it's what I use in my
   projects.
 
-Run tests with `go test ./...`. This tests all pools and ensures that they
-complete all jobs, use the full concurrency available, and do not exceed that
-concurrency.
+Run tests with `go test ./... -race`. This tests all pools and ensures that they
+complete all jobs, use the full concurrency available, and do not exceed the
+specified concurrency.
 
 Run benchmarks with `go test bench=.`. Here are the results from running an
 extended benchmark on my 2020 M1 MacBook Air:
 
 ```
-BenchmarkWorkerPool-8      	    3108	   3558367 ns/op
-BenchmarkChannelPool-8     	    5640	   2246060 ns/op
-BenchmarkSemaphorePool-8   	    4971	   2711632 ns/op
+$ go test -bench=. -benchtime=60s
+goos: darwin
+goarch: arm64
+pkg: github.com/mplewis/go-worker-pools
+BenchmarkWorkerPool-8      	   21027	   3554945 ns/op
+BenchmarkChannelPool-8     	   31254	   2253164 ns/op
+BenchmarkSemaphorePool-8   	   28473	   2572525 ns/op
 ```
 
 ![Bar graph of benchmark results](assets/benchmarks.png)

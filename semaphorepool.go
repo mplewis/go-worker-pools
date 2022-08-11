@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"sync"
 
 	"golang.org/x/sync/semaphore"
 )
@@ -10,25 +11,34 @@ import (
 type SemaphorePool struct {
 	concurrency int64
 	sem         *semaphore.Weighted
+	wg          *sync.WaitGroup
 	ctx         context.Context
 }
 
 func NewSemaphorePool(concurrency int64) *SemaphorePool {
-	return &SemaphorePool{concurrency, semaphore.NewWeighted(int64(concurrency)), context.Background()}
+	return &SemaphorePool{
+		concurrency,
+		semaphore.NewWeighted(int64(concurrency)),
+		&sync.WaitGroup{},
+		context.Background(),
+	}
 }
 
 func (s SemaphorePool) Submit(f func()) {
+	s.wg.Add(1)
 	err := s.sem.Acquire(s.ctx, 1)
 	if err != nil {
 		panic(err)
 	}
 	go func() {
 		f()
+		s.wg.Done()
 		s.sem.Release(1)
 	}()
 }
 
 func (s SemaphorePool) Wait() {
+	s.wg.Wait()
 	err := s.sem.Acquire(s.ctx, s.concurrency)
 	if err != nil {
 		panic(err)
