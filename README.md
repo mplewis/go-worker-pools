@@ -6,12 +6,19 @@ pools with bounded concurrency.
 I do not guarantee that any of this code is production-ready. This is simply an
 experiment to compare different strategies for managing concurrency in Go.
 
+If something in this repo is incorrect or misleading, I'd like to correct it.
+Please open a GitHub issue to let me know.
+
+# Structure
+
 These worker pools satisfy a basic common interface so that we can test and
 bench them against each other:
 
 - Users can `Submit()` a function task to the pool. This function will not
   block.
 - Users can `Wait()` for all work in the pool to complete.
+
+# Strategies
 
 The following worker pool strategies are featured here:
 
@@ -26,6 +33,8 @@ The following worker pool strategies are featured here:
   [gammazero/workerpool](https://github.com/gammazero/workerpool) package to
   limit concurrency. This is my favorite interface and it's what I use in my
   projects.
+
+# Testing and Benchmarking
 
 Run tests with `go test ./... -race`. This tests all pools and ensures that they
 complete all jobs, use the full concurrency available, and do not exceed the
